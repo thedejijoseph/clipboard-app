@@ -1,18 +1,25 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div id="container">
+    <c-button>
+      <router-link to="/about">About Clipboard</router-link>
+    </c-button>
+    <c-button>
+      <router-link to="/clipboard">Go to clipboard</router-link>
+    </c-button>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
+import {
+  CButton
+}
+from "@chakra-ui/vue"
 
 export default {
   name: 'Home',
   components: {
-    HelloWorld
+    CButton
   }
 }
 </script>
