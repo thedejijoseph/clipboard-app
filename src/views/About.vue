@@ -3,6 +3,9 @@
     <c-button>
       <router-link to="/">Back home</router-link>
     </c-button>
+    <c-button>
+      <router-link to="/clipboard">Go to clipboard</router-link>
+    </c-button>
   </div>
 </template>
 
