@@ -3,10 +3,10 @@
     :p="{ base:'4', lg:'10'}"
     bg="#D4D2D9"
     :maxW="{ base: '100%', lg:'45em' }"
-    h="100vh"
+    minH="100vh"
     display="flex"
     flex-direction="column"
-    justify-content="center"
+    justify-content="flex-start"
     m="auto"
   >
 
