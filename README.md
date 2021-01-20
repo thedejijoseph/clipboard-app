@@ -1,24 +1,9 @@
-# clipboard-app
+# Clipboard
 
-## Project setup
-```
-npm install
-```
+Use applicattion as a clipboard to hold text content between devices.
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+## Technologies used
 
-### Compiles and minifies for production
-```
-npm run build
-```
+**Frontend**: Vue2 + Chakra UI
 
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+**Backend**: Python/Tornado + Redis on GCP
