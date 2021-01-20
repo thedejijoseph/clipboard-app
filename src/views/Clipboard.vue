@@ -28,6 +28,7 @@
           align="left"
           size="lg"
           color="#253259"
+          @click="deleteClipboard"
         >
           Delete clipboard
         </c-button>
@@ -38,52 +39,65 @@
       <c-text 
         :fontSize="{ base:'3em', lg:'4em' }"
         fontWeight="bold"
+        is-truncated
+        v-if="clipboardId"
       >
-        [ argon ]
+        [ {{ clipboardId }} ]
+      </c-text>
+      <c-text
+        fontWeight="bold"
+        :fontSize="{ base: '1.5em', lg: '2em' }"
+        py=4
+        color="tangerine"
+        v-else
+      >
+        ! Select/Open a clipboard first
       </c-text>
     </c-box>
 
     <c-box>
       <c-form-control my="3">
         <c-form-label>Add content to clipboard</c-form-label>
-        <c-textarea w="100%" placeholder="Paste text content"/>
+        <c-textarea 
+          w="100%" 
+          placeholder="Paste text content" 
+          v-model="textContent" 
+          :value="textContent" 
+        />
+        <c-form-helper-text 
+          color="red.300"
+          v-if="error"
+        >
+          {{ errorMsg }}
+        </c-form-helper-text>
       </c-form-control>
       <c-button
         bg="#F2B33D"
+        @click="addItemToClipboard"
       >
         Save
       </c-button>
     </c-box>
 
     <c-box mt="6">
-      <c-simple-grid :columns="[1, null, 2]" :spacing="3">
-        <c-box>
-          <c-textarea is-disabled placeholder="Some random stuff" />
-          <c-box display="flex" justify-content="space-between">
-            <c-button
-              bg="#F2B33D"
-              my="3"
-            >
-              Copy
-            </c-button>
-            <c-button
-              variant="link"
-              color="#253259"
-              my="3"
-              pos="relative"
-              bottom="0"
-              right="0"
-            >
-              Delete
-            </c-button>
+      <c-simple-grid 
+        :columns="[1, 2, 2]" 
+        :spacing="3"
+      >
+        <c-box v-for="item in clipboardItems" :key="item.id">
+          <c-box
+            bg="#ddd"
+            minH="5em"
+            rounded="md"
+            p="3"
+          >
+            <c-text>{{ item.content }}</c-text>
           </c-box>
-        </c-box>
-        <c-box>
-          <c-textarea isDisabled>Some random stuff</c-textarea>
           <c-box display="flex" justify-content="space-between">
             <c-button
               bg="#F2B33D"
               my="3"
+              @click="copyToClipboard(item.content)"
             >
               Copy
             </c-button>
@@ -91,30 +105,7 @@
               variant="link"
               color="#253259"
               my="3"
-              pos="relative"
-              bottom="0"
-              right="0"
-            >
-              Delete
-            </c-button>
-          </c-box>
-        </c-box>
-        <c-box>
-          <c-textarea isDisabled>Some random stuff</c-textarea>
-          <c-box display="flex" justify-content="space-between">
-            <c-button
-              bg="#F2B33D"
-              my="3"
-            >
-              Copy
-            </c-button>
-            <c-button
-              variant="link"
-              color="#253259"
-              my="3"
-              pos="relative"
-              bottom="0"
-              right="0"
+              @click="removeItemFromClipboard(item.id)"
             >
               Delete
             </c-button>
@@ -132,12 +123,26 @@ import {
   CButton,
   CIcon,
   CText,
+  CFormHelperText,
   CFormControl,
   CTextarea,
   CFormLabel,
   CSimpleGrid,
 }
 from "@chakra-ui/vue"
+
+function generateRandomId(size) {
+  const pool = "abcdefghijklmnopqrstuvwxyz0123456789"
+  let selection = ''
+
+  var i;
+  for (i=0; i < size; i++) {
+    const index = Math.floor(Math.random() * pool.length);
+    selection = selection + pool[index]
+  }
+
+  return selection
+}
 
 
 export default {
@@ -147,10 +152,85 @@ export default {
     CButton,
     CIcon,
     CText,
+    CFormHelperText,
     CFormControl,
     CTextarea,
     CFormLabel,
     CSimpleGrid,
+  },
+  data() {
+    return {
+      textContent: '',
+      error: false,
+      errorMsg: 'Text box is empty'
+    }
+  },
+  computed: {
+    clipboardId() {
+      return this.$store.getters.clipboardId
+    },
+    clipboardItems() {
+      return this.$store.getters.clipboardItems
+    }
+  },
+  methods: {
+    addItemToClipboard() {
+      let formattedTextContent = this.textContent.replace(/\s+/g, '')
+      if (!formattedTextContent) {
+        this.error = true
+        this.errorMsg = 'Text box is empty'
+        return
+      }
+
+      if (!this.clipboardId){
+        this.$toast({
+          title: 'Clipboard not set',
+          description: 'Select/Open a clipboard to add items to first',
+          status: 'info',
+          duration: 3000,
+          variant: 'subtle'
+        })
+        return
+      }
+
+      const itemId = generateRandomId(3)
+      const textContent = this.textContent
+
+      this.$store.commit({
+        type: 'addItemToClipboard',
+        id: itemId,
+        content: textContent
+      })
+
+      this.textContent = ''
+      this.error = false
+    },
+    removeItemFromClipboard(itemId) {
+      this.$store.commit({
+        type: 'removeItemFromClipboard',
+        itemId: itemId
+      })
+    },
+    copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(function() {
+        console.log('Copying to clipboard was successful!');
+      }, function(err) {
+        console.error('Could not copy text: ', err);
+      });
+      this.$toast({
+        title: 'Copied',
+        description: 'Text copied to clipboard',
+        status: 'info',
+        duration: 3000,
+        variant: 'subtle'
+      })
+    },
+    deleteClipboard(){
+      this.$store.commit({
+        type: 'unsetClipboard'
+      })
+      this.$router.push('/')
+    }
   }
 }
 </script>

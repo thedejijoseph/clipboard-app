@@ -25,12 +25,22 @@
     <c-box>
       <c-form-control my="3">
         <c-form-label>Clipboard Identifier</c-form-label>
-        <c-input type="text" w="100%" placeholder="Your unique identifier"/>
+        <c-input 
+          type="text" 
+          w="100%" 
+          placeholder="Your unique identifier"
+          v-model="clipboardId"
+        />
+        <c-form-helper-text
+          color="red.300"
+          v-if="error"
+        >
+          {{ errorMsg }}
+        </c-form-helper-text>
       </c-form-control>
       <c-button
         bg="#F2B33D"
-        as="router-link"
-        to="/clipboard"
+        @click="setClipboard"
       >
         Open clipboard
       </c-button>
@@ -48,6 +58,7 @@ import {
   CFormControl,
   CInput,
   CFormLabel,
+  CFormHelperText,
 }
 from "@chakra-ui/vue"
 
@@ -62,6 +73,47 @@ export default {
     CFormControl,
     CInput,
     CFormLabel,
+    CFormHelperText,
+  },
+  data() {
+    return {
+      clipboardId: '',
+      error: false,
+      errorMsg: ''
+    }
+  },
+  computed: {
+    formattedClipboardId() {
+      let clipboardId = this.clipboardId.toLowerCase()
+      clipboardId = clipboardId.replace(/\s+/g, '') // strip whitespace
+
+      return clipboardId
+    }
+  },
+  methods: {
+    setClipboard(){
+      if (!this.formattedClipboardId) {
+        this.error = true
+        this.errorMsg = 'Clipboard Identifier cannot be blank'
+        return
+      }
+
+      console.log(this.formattedClipboardId)
+
+      this.$store.commit({
+        type: 'setClipboard',
+        clipboardId: this.formattedClipboardId,
+        items: []
+      })
+
+      this.clipboardId = ''
+      this.error = false
+      this.$router.push('/clipboard')
+      
+    }
   }
 }
+
+
+
 </script>
