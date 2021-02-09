@@ -51,7 +51,7 @@
         color="tangerine"
         v-else
       >
-        ! Select/Open a clipboard first
+        Open a clipboard first!
       </c-text>
     </c-box>
 
@@ -174,7 +174,7 @@ export default {
     }
   },
   methods: {
-    addItemToClipboard() {
+    async addItemToClipboard() {
       let formattedTextContent = this.textContent.replace(/\s+/g, '')
       if (!formattedTextContent) {
         this.error = true
@@ -185,7 +185,6 @@ export default {
       if (!this.clipboardId){
         this.$toast({
           title: 'Clipboard not set',
-          description: 'Select/Open a clipboard to add items to first',
           status: 'info',
           duration: 3000,
           variant: 'subtle'
@@ -196,20 +195,70 @@ export default {
       const itemId = generateRandomId(3)
       const textContent = this.textContent
 
-      this.$store.commit({
-        type: 'addItemToClipboard',
-        id: itemId,
-        content: textContent
-      })
+      const response = await fetch(
+        `${this.$store.state.clipboardApi}/clipboard/${this.clipboardId}/items/${itemId}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-type': 'application/json; charset=UTF-8'
+          },
+          body: JSON.stringify({
+            id: itemId,
+            content: textContent
+          })
+        }
+      ).then((response) => {return response.json()})
 
-      this.textContent = ''
-      this.error = false
+      if (response.success) {
+        this.$store.commit({
+          type: 'addItemToClipboard',
+          id: itemId,
+          content: textContent
+        })
+
+        this.textContent = ''
+        this.error = false
+      } else {
+        console.log(response.errors[0].message)
+        this.$toast({
+          title: response.message,
+          status: 'error',
+          duration: 3000,
+          variant: 'subtle'
+        })
+        return
+      }
+
     },
-    removeItemFromClipboard(itemId) {
-      this.$store.commit({
-        type: 'removeItemFromClipboard',
-        itemId: itemId
-      })
+    async removeItemFromClipboard(itemId) {
+
+      const response = await fetch(
+        `${this.$store.state.clipboardApi}/clipboard/${this.clipboardId}/items/${itemId}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-type': 'application/json; charset=UTF-8'
+          }
+        }
+      ).then((response) => {return response.json()})
+
+      if (response.success) {
+        this.$store.commit({
+          type: 'removeItemFromClipboard',
+          itemId: itemId
+        })
+      } else {
+        console.log(response.errors[0].message)
+        this.$toast({
+          title: response.message,
+          status: 'error',
+          duration: 3000,
+          variant: 'subtle'
+        })
+        return
+      }
+
+      
     },
     copyToClipboard(text) {
       navigator.clipboard.writeText(text).then(function() {
@@ -218,18 +267,42 @@ export default {
         console.error('Could not copy text: ', err);
       });
       this.$toast({
-        title: 'Copied',
-        description: 'Text copied to clipboard',
+        title: 'Text copied to clipboard',
         status: 'info',
         duration: 3000,
         variant: 'subtle'
       })
     },
-    deleteClipboard(){
-      this.$store.commit({
-        type: 'unsetClipboard'
-      })
-      this.$router.push('/')
+    async deleteClipboard(){
+      if (!this.clipboardId){
+        this.$router.push('/')
+        return
+      }
+
+      const response = await fetch(
+        `${this.$store.state.clipboardApi}/clipboard/${this.clipboardId}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-type': 'application/json; charset=UTF-8'
+          }
+        }
+      ).then((response) => {return response.json()})
+
+      if (response.success) {
+        this.$store.commit({
+          type: 'unsetClipboard'
+        })
+        this.$router.push('/')
+      } else {
+        console.log(response.errors[0].message)
+        this.$toast({
+          title: response.message,
+          status: 'error',
+          duration: 3000,
+          variant: 'subtle'
+        })
+      }
     }
   }
 }

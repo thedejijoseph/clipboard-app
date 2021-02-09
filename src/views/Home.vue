@@ -91,24 +91,37 @@ export default {
     }
   },
   methods: {
-    setClipboard(){
+    async setClipboard(){
       if (!this.formattedClipboardId) {
         this.error = true
         this.errorMsg = 'Clipboard Identifier cannot be blank'
         return
       }
 
-      console.log(this.formattedClipboardId)
+      const response = await fetch(
+        `${this.$store.state.clipboardApi}/clipboard/${this.formattedClipboardId}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-type': 'application/json; charset=UTF-8'
+          }
+        }
+      ).then((response) => {return response.json()})
+      
+      if (response.success) {
+        this.$store.commit({
+          type: 'setClipboard',
+          clipboardId: response.data.clipboard_id,
+          items: response.data.items
+        })
 
-      this.$store.commit({
-        type: 'setClipboard',
-        clipboardId: this.formattedClipboardId,
-        items: []
-      })
-
-      this.clipboardId = ''
-      this.error = false
-      this.$router.push('/clipboard')
+        this.clipboardId = ''
+        this.error = false
+        this.$router.push('/clipboard')
+      } else {
+        this.error = true
+        this.errorMsg = response.errors[0]['message']
+      }
       
     }
   }
