@@ -196,7 +196,7 @@ export default {
       const textContent = this.textContent
 
       const response = await fetch(
-        `${this.$store.state.clipboardApi}/clipboard/${this.clipboardId}/items/${itemId}`,
+        `${this.$store.state.clipboardApi}/clipboard/${this.clipboardId}/items`,
         {
           method: 'POST',
           headers: {
@@ -233,12 +233,15 @@ export default {
     async removeItemFromClipboard(itemId) {
 
       const response = await fetch(
-        `${this.$store.state.clipboardApi}/clipboard/${this.clipboardId}/items/${itemId}`,
+        `${this.$store.state.clipboardApi}/clipboard/${this.clipboardId}/items`,
         {
           method: 'DELETE',
           headers: {
             'Content-type': 'application/json; charset=UTF-8'
-          }
+          },
+          body: JSON.stringify({
+            id: itemId,
+          })
         }
       ).then((response) => {return response.json()})
 
