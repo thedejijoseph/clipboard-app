@@ -18,7 +18,7 @@
         color="#77808C"
         :fontSize="{ base:'1.2em', lg:'1.6em' }"
       >
-        Clipboards persist for 8 hours after it was last opened
+        Hold text content between devices
       </c-text>
     </c-box>
 
