@@ -1,9 +1,11 @@
-# Clipboard
+# Clipboard App
 
-Use applicattion as a clipboard to hold text content between devices.
+A multi-device clipboard, for those times you need to move text from your laptop to your phone.
 
-## Technologies used
+Like your regular TODO app in functionality. Built to get started with Vue.
 
-**Frontend**: Vue2 + Chakra UI
 
-**Backend**: Python/Tornado + Redis on GCP
+## Tech
++ Built with Vue 2 + vue-router
++ Chakra UI - Vue
++ Connecting to an API built with Tornado ([here](http://github.com/wrecodde/clipboard-api))
