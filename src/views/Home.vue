@@ -13,12 +13,14 @@
     <c-box>
       <c-heading :fontSize="{ base:'3em', lg:'4em' }">
         Clipboard
+        <c-link as="router-link" to="/about" fontWeight="bold" color="#77808C" :fontSize="{ base: '0em', lg:'1em' }">/about</c-link>
       </c-heading>
       <c-text 
         color="#77808C"
         :fontSize="{ base:'1.2em', lg:'1.6em' }"
       >
         Hold text content between devices
+        <c-link as="router-link" to="/about" fontWeight="bold" color="#77808C" :fontSize="{ base: '1em', lg:'0em' }">../about</c-link>
       </c-text>
     </c-box>
 
@@ -53,6 +55,7 @@
 import {
   CBox,
   CButton,
+  CLink,
   CText,
   CHeading,
   CFormControl,
@@ -68,6 +71,7 @@ export default {
   components: {
     CBox,
     CButton,
+    CLink,    
     CText,
     CHeading,
     CFormControl,
