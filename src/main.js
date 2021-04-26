@@ -10,7 +10,7 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
   state: {
-    clipboardApi: 'https://clipboard-api-cgsw3te2oq-uc.a.run.app',
+    clipboardApi: 'https://wx-clipboard-api.herokuapp.com',
     clipboard: {
       clipboardId: '',
       items: []
